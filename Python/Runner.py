@@ -21,7 +21,7 @@ shiftCount = 2		# number of shift registers
 musicVolume = .5	# music volume
 overheatThresh = 5	# seconds before overheat
 musicWhileOff = False	# allow music to run while power switch off
-soundFiles = {'start': "/opt/GB/Music/KJH_PackstartCombo.ogg", 'hum': "/opt/GB/Music/HumShort.wav", 'stop': "/opt/GB/Music/KJH_PackstopDigital.ogg", "scriptReady": "/opt/GB/Music/Mac.ogg"}
+soundFiles = {'start': "/opt/GB/Music/KJH_PackstartCombo.ogg", 'hum': "/opt/GB/Music/HumShort.wav", 'stop': "/opt/GB/Music/KJH_PackstopDigital.ogg", "scriptReady": "/opt/GB/Music/Mac.ogg", "wandStart" : "/opt/GB/Music/WandShootStart.ogg", "wandLoop": "/opt/GB/Music/WandShootLoop.ogg", "wandEnd": "/opt/GB/Music/WandShootEnd.ogg"}
 musicFiles = {'Higher': "/opt/GB/Music/HigherHigher.ogg", "Theme": "/opt/GB/Music/GBTheme.ogg"}
 
 #############################
@@ -35,16 +35,16 @@ ready.play()
 # Global and state vars
 #############################
 
-startSound = Sound(soundFiles["start"])		# start up sound
-humSound = Sound(soundFiles["hum"], -1)		# bg sound of hum
-blastSound = BlastSound()			# class for firing shooting
-music = BGMusic(musicVolume)			# music track
-ggs = GrabGBShift(pin1, pin2, pin3, shiftCount)	# light class
-isPlaying = False				# music state
-systemOn = False				# power switch state
-isBlasting = False				# shooting state
-blastTimer = time.time()			# how long blast button pressed
-isOverheating = False				# overheat state
+startSound = Sound(soundFiles["start"])								# start up sound
+humSound = Sound(soundFiles["hum"], -1)								# bg sound of hum
+blastSound = BlastSound(soundFiles["wandStart"], soundFiles["wandLoop"], soundFiles["wandEnd"])	# class for firing shooting
+music = BGMusic(musicVolume)									# music track
+ggs = GrabGBShift(pin1, pin2, pin3, shiftCount)							# light class
+isPlaying = False										# music state
+systemOn = False										# power switch state
+isBlasting = False										# shooting state
+blastTimer = time.time()									# how long blast button pressed
+isOverheating = False										# overheat state
 
 #############################
 # Async listener callbacks

@@ -42,10 +42,10 @@ class Sound:
 		self.snd.stop()
 
 class BlastSound:
-	def __init__(self):
-		self.startFile = "/opt/GB/Music/WandShootStart.ogg"
-		self.loopFile = "/opt/GB/Music/WandShootLoop.ogg"
-		self.endFile = "/opt/GB/Music/WandShootEnd.ogg"
+	def __init__(self, start, loop, end):
+		self.startFile = start
+		self.loopFile = loop
+		self.endFile = end
 		pg.init()
 		self.startSound = pg.mixer.Sound(self.startFile)
 		self.loopSound = pg.mixer.Sound(self.loopFile)
