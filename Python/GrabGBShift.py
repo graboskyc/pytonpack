@@ -12,11 +12,21 @@ class GrabGBShift:
 		self.srct = srct
 		self.setMode("Fill")
 		self.pattern = []
-		self.blinkDelay = .09
+		self.defaultBlinkDelay = .09
+		self.blinkDelay = self.defaultBlinkDelay
 
 		self.getPattern()
 		shift.init(pin1,pin2,pin3,srct)
 		self.shift = shift
+
+	def adjustSpeed(self, delay):
+		self.blinkDelay = delay
+
+	def getMode(self):
+		return self.mode
+
+	def defaultSpeed(self):
+		self.blinkDelay = self.defaultBlinkDelay
 
 	def getPattern(self):
 		mode = self.mode
@@ -256,6 +266,8 @@ class GrabGBShift:
 
 	def processPattern(self):
 		pattern = self.pattern
+		# copy locally so we dont adjust in the middle of a cycle
+		localBlinkDelay = self.blinkDelay
 		for bits in self.pattern:
 	        	self.shift.write(bits)
 	        	if(self.mode=="Fill"):
@@ -267,6 +279,6 @@ class GrabGBShift:
 			elif(self.mode=="Error1"):
 				time.sleep(.15)
 	        	else:
-	        		time.sleep(self.blinkDelay)
+	        		time.sleep(localBlinkDelay)
 		if(self.mode=="Fill"):
 			self.setMode("Proton")

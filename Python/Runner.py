@@ -5,8 +5,13 @@ import time
 import sys
 import threading
 import signal
+import os
+import pyttsx
 from GrabGBMusic import BGMusic,Sound, BlastSound
 from GrabGBShift import GrabGBShift
+from GrabGBMattyWand import MattyWand
+
+Pack = {}
 
 #############################
 # user config
@@ -14,12 +19,13 @@ from GrabGBShift import GrabGBShift
 pin1 = 22		# serial in
 pin2 = 17		# SRCLK
 pin3 = 23		# RCLK
-pinPower = 4		# power switch 
-pinMusic = 25		# enable disable music
-pinShoot = 24		# shoot
+pinMusic = 4		# enable disable music
+pinWand = 25		# audio connection to wand
+pinLMode = 27 		# manually change lights
 shiftCount = 2		# number of shift registers
-musicVolume = .5	# music volume
-overheatThresh = 5	# seconds before overheat
+musicVolume = .75	# music volume
+Pack['overheatSpeedThresh'] = 5	# seconds before speed up before overheat
+Pack['overheatThresh'] = 10	# seconds before overheat
 musicWhileOff = False	# allow music to run while power switch off
 soundFiles = {'start': "/opt/GB/Music/KJH_PackstartCombo.ogg", 'hum': "/opt/GB/Music/HumShort.wav", 'stop': "/opt/GB/Music/KJH_PackstopDigital.ogg", "scriptReady": "/opt/GB/Music/Mac.ogg", "wandStart" : "/opt/GB/Music/WandShootStart.ogg", "wandLoop": "/opt/GB/Music/WandShootLoop.ogg", "wandEnd": "/opt/GB/Music/WandShootEnd.ogg"}
 musicFiles = {'Higher': "/opt/GB/Music/HigherHigher.ogg", "Theme": "/opt/GB/Music/GBTheme.ogg"}
@@ -34,96 +40,95 @@ ready.play()
 #############################
 # Global and state vars
 #############################
-
 startSound = Sound(soundFiles["start"])								# start up sound
 humSound = Sound(soundFiles["hum"], -1)								# bg sound of hum
-blastSound = BlastSound(soundFiles["wandStart"], soundFiles["wandLoop"], soundFiles["wandEnd"])	# class for firing shooting
+Pack['blastSound'] = BlastSound(soundFiles["wandStart"], soundFiles["wandLoop"], soundFiles["wandEnd"])	# class for firing shooting
 music = BGMusic(musicVolume)									# music track
-ggs = GrabGBShift(pin1, pin2, pin3, shiftCount)							# light class
-isPlaying = False										# music state
-systemOn = False										# power switch state
-isBlasting = False										# shooting state
-blastTimer = time.time()									# how long blast button pressed
-isOverheating = False										# overheat state
+Pack['ggs'] = GrabGBShift(pin1, pin2, pin3, shiftCount)							# light class
+Pack['isPlaying']= False										# music state
+Pack['systemOn'] = False										# power switch state
+Pack['isBlasting'] = False										# shooting state
+Pack['blastTimer'] = time.time()									# how long blast button pressed
+Pack['isOverheating'] = False										# overheat state
+speechEngine = pyttsx.init()									# text to speech engine
+wandTracker = MattyWand()									# tracks commands from matty wand
 
 #############################
 # Async listener callbacks
 #############################
 # change light pattern
 def LightListener(channel):
+	global Pack
+	global speechEngine
 	print "Called light handler"
-	ggs.advanceMode()
+	curMode = Pack['ggs'].getMode()
+	Pack['ggs'].advanceMode()
+	newMode = Pack['ggs'].getMode()
+	#os.system("espeak 'Changing modes from "+curMode+" to "+newMode+"'")
+	speechEngine.say("Light mode is. "+newMode)
+	speechEngine.runAndWait()
+	
 
 # start and stop music
 def MusicListener(channel):
         print "Called music handler"
-	global isPlaying
-	global systemOn
+	global Pack
 	global musicWhileOff
-	if systemOn or musicWhileOff:
-		if(isPlaying):
-			isPlaying = False
+	if Pack['systemOn'] or musicWhileOff:
+		if(Pack['isPlaying']):
+			Pack['isPlaying'] = False
 			music.stop()
 		else:
 			music.play()
-			isPlaying = True
+			Pack['isPlaying'] = True
+
+# listens for signals from wand
+def WandListener(channel):
+        global wandTracker
+	global Pack
+
+        if(wandTracker.initial == 0):
+                threading.Timer(wandTracker.timeout, wandTracker.Process, ([Pack])).start()
+                wandTracker.initial = 1
+        wandTracker.Inc()
+
+        print "counter now: " + str(wandTracker.counter)
 
 # overheat routine 
 def overheat():
-	global blastSound
-	global isOverheating
-	global isBlasting
-	global ggs
-	global systemOn
+	global Pack
 
-	blastSound.end()
-	isBlasting = False
-	ggs.setMode("Error1")
+	print "begin overheat routine"
+
+	Pack['blastSound'].end()
+	Pack['isBlasting'] = False
+	Pack['ggs'].setMode("Error1")
 	time.sleep(3)
-	systemOn = False
+	Pack['systemOn'] = False
 	
 # start and stop shooting
 def ShootListener(channel):
+	global wandTracker
 	print "Called shoot handler"
-	global isBlasting
-	global systemOn
-	global isOverheating
-	global blastTimer
-	global overheatThresh
-	if(systemOn):
-		if((not isBlasting) and (not isOverheating)):
-			isBlasting = True
-			blastTime = time.time()
-			blastSound.start()
-			while ((GPIO.input(24) ==1) and (not isOverheating)):
-				time.sleep(.01)
-				if((time.time() - blastTime) > overheatThresh):
-					isOverheating = True
-				if isOverheating:
-					overheat()
-			if(not isOverheating):
-				blastSound.end()
-				isBlasting = False
-	isOverheating = False
+	wandTracker.Shoot()
 
-# called when control c
 def quitHander(signum, frame):
 	quitOut()
 	exit()
 
 # power off switch
 def quitOut():
-	global systemOn
+	global Pack
 	global musicWhileOff
-	if systemOn:
+	if Pack['systemOn']:
 		if not musicWhileOff:
 			music.stop()
-		systemOn = False
+		Pack['systemOn'] = False
 		humSound.stop()
 		sound = Sound(soundFiles["stop"])
         	sound.play()
-		ggs.setMode("Empty")
-		ggs.processPattern()
+		Pack['ggs'].setMode("Empty")
+		Pack['ggs'].processPattern()
 
 #############################
 # Main prog and loop
@@ -131,35 +136,38 @@ def quitOut():
 
 def main():
 	# power on
-	global systemOn
+	global Pack
 	global musicFiles
 	global pinMusic
-	global pinPower
-	global pinShoot
+	global pinLMode
+	global pinWand
+	global wandTracker
 
-	music.setTrack(musicFiles["Higher"])
+	music.setTrack(musicFiles["Theme"])
 
 	GPIO.setmode(GPIO.BCM)
-	GPIO.setup(pinPower, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)	# power switch
 	GPIO.setup(pinMusic, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)	# start and stop music
-	GPIO.setup(pinShoot, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)	# shoot button
+	GPIO.setup(pinLMode, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)       # light mode button
 
-        GPIO.add_event_detect(pinMusic, GPIO.FALLING, callback=MusicListener, bouncetime=500)	# start and stop music
-	GPIO.add_event_detect(pinShoot, GPIO.RISING, callback=ShootListener, bouncetime=500)	# shoot button
+        GPIO.add_event_detect(pinMusic, GPIO.FALLING, callback=MusicListener, bouncetime=1000)	# start and stop music
+	GPIO.add_event_detect(pinLMode, GPIO.FALLING, callback=LightListener, bouncetime=1000)   # light mode button
 	signal.signal(signal.SIGINT, quitHander)
+
+	GPIO.setup(pinWand, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)       		# wand connection
+        GPIO.add_event_detect(pinWand, GPIO.RISING, callback=WandListener)     # wand connection
 
 	# main loop
 	while True:
 		# if switch on state
-		if(GPIO.input(pinPower) ==1 ):
+		if wandTracker.systemOn:
 			# we were off so start power up sequence
-			if not systemOn:
+			if not Pack['systemOn']:
 				startSound.play()
         			humSound.play()
-				systemOn = True
-				ggs.setMode("Fill")
+				Pack['systemOn'] = True
+				Pack['ggs'].setMode("Fill")
 			# blink lights
-			ggs.processPattern()
+			Pack['ggs'].processPattern()
 		# switch is off
 		else:
 			# power down sequence

@@ -5,7 +5,7 @@ import pygame as pg
 import threading
 
 class BGMusic:
-	def __init__(self, volume=0.8):
+	def __init__(self, volume=1.5):
 		self.volume = volume
 		freq = 44100     # audio CD quality
                 bitsize = -16    # unsigned 16 bit
@@ -53,7 +53,7 @@ class BlastSound:
 		self.pg = pg
 	def start(self):
 		self.startSound.play()
-		time.sleep(.5)
+		time.sleep(.25)
 		self.loopSound.play(-1)
 	def end(self):
 		self.loopSound.stop()
