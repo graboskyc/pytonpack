@@ -1,23 +1,26 @@
 #!/usr/bin/python
 import RPi.GPIO as GPIO
-import PiShiftPy as shift
+from GrabGBPSP import PSP
 import time
 import sys
 
-class GrabGBShift:
-	def __init__(self, pin1, pin2, pin3, srct):
+class GrabGBLights:
+	def __init__(self, pin1, pin2, pin3, pin4):
 		self.pin1 = pin1
 		self.pin2 = pin2
 		self.pin3 = pin3
-		self.srct = srct
-		self.setMode("Fill")
+		self.pin4 = pin4
 		self.pattern = []
 		self.defaultBlinkDelay = .09
 		self.blinkDelay = self.defaultBlinkDelay
 
+		self.cyPattern = [0x08, 0x04, 0x02, 0x01]
+                self.cyCount = 0
+
+		self.setMode("Fill")
 		self.getPattern()
-		shift.init(pin1,pin2,pin3,srct)
-		self.shift = shift
+
+		self.shift = PSP(pin1,pin4,pin2,pin3)
 
 	def adjustSpeed(self, delay):
 		self.blinkDelay = delay
@@ -31,6 +34,7 @@ class GrabGBShift:
 	def getPattern(self):
 		mode = self.mode
 		pattern = []
+
 		#power on and off seq
 		if (mode == "Fill") or (mode == "Empty"):
                 	pattern.append(0x0000) # 00000000000000
@@ -234,6 +238,22 @@ class GrabGBShift:
                         pattern.append(0x03F0) # 00001111110000
 			pattern.append(0x3C0F) # 11110000001111
                         pattern.append(0x03F0) # 00001111110000
+		if mode == "Test":
+                        #pattern.append(0x2000) # 10000000000000
+                        #pattern.append(0x1000) # 01000000000000
+                        #pattern.append(0x0800) # 00100000000000
+                        #pattern.append(0x0400) # 00010000000000
+                        #pattern.append(0x0200) # 00001000000000
+                        #pattern.append(0x0100) # 00000100000000
+                        #pattern.append(0x0080) # 00000010000000
+                        #pattern.append(0x0040) # 00000001000000
+                        #pattern.append(0x0020) # 00000000100000
+                        #pattern.append(0x0010) # 00000000010000
+                        #pattern.append(0x0008) # 00000000001000
+                        #pattern.append(0x0004) # 00000000000100
+                        #pattern.append(0x0002) # 00000000000010
+                        pattern.append(0x0001) # 00000000000001
+			#pattern.append(0x2FFF) # 11111111111111
 		if (mode == "DotOut") or (mode == "LineOut") or (mode == "Empty"):
 			pattern = pattern[::-1] # reverse it
 
@@ -268,8 +288,10 @@ class GrabGBShift:
 		pattern = self.pattern
 		# copy locally so we dont adjust in the middle of a cycle
 		localBlinkDelay = self.blinkDelay
+		print "Counter: " + str(self.cyCount) + " value: " + str(self.cyPattern[self.cyCount])
+
 		for bits in self.pattern:
-	        	self.shift.write(bits)
+	        	self.shift.write(bits, self.cyPattern[self.cyCount])
 	        	if(self.mode=="Fill"):
 				time.sleep(.04)
 			elif(self.mode=="Empty"):
@@ -282,3 +304,8 @@ class GrabGBShift:
 	        		time.sleep(localBlinkDelay)
 		if(self.mode=="Fill"):
 			self.setMode("Proton")
+
+
+		self.cyCount = self.cyCount + 1
+                if (self.cyCount == 4):
+                        self.cyCount = 0
