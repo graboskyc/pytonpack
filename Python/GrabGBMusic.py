@@ -5,7 +5,7 @@ import pygame as pg
 import threading
 
 class BGMusic:
-	def __init__(self, volume=1.5):
+	def __init__(self, volume=1):
 		self.volume = volume
 		freq = 44100     # audio CD quality
                 bitsize = -16    # unsigned 16 bit
@@ -21,9 +21,7 @@ class BGMusic:
 	def play(self):
         	try:                                                           
                 	pg.mixer.music.load(self.file)
-                	print("Music file {} loaded!".format(self.file))      
         	except pg.error:                                               
-                	print("File {} not found! ({})".format(self.file, pg.get_error()))
                 	return
         	pg.mixer.music.play()
 	def stop(self):

@@ -5,7 +5,8 @@ import time
 import sys
 
 class GrabGBLights:
-	def __init__(self, pin1, pin2, pin3, pin4):
+	def __init__(self, Log, pin1, pin2, pin3, pin4):
+		self.Log = Log
 		self.pin1 = pin1
 		self.pin2 = pin2
 		self.pin3 = pin3
@@ -280,7 +281,7 @@ class GrabGBLights:
 		self.setMode(mode)
 
 	def setMode(self, mode):
-		print "setting mode to: " + mode
+		self.Log.Log("setting mode to: " + mode)
 		self.mode = mode
 		self.getPattern()
 
@@ -288,7 +289,7 @@ class GrabGBLights:
 		pattern = self.pattern
 		# copy locally so we dont adjust in the middle of a cycle
 		localBlinkDelay = self.blinkDelay
-		print "Counter: " + str(self.cyCount) + " value: " + str(self.cyPattern[self.cyCount])
+		self.Log.Log("Counter: " + str(self.cyCount) + " value: " + str(self.cyPattern[self.cyCount]))
 
 		for bits in self.pattern:
 	        	self.shift.write(bits, self.cyPattern[self.cyCount])

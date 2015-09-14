@@ -20,25 +20,25 @@ class MattyWand:
 
         def Process(self, P):
 		global isBlasting
-                print "Processing..."
+                P['Log'].Log("Processing...")
 
                 if(self.counter >= 6):
-                        print "Turned on"
+                        P['Log'].Log("Turned on")
 			self.systemOn = True
                 elif((self.counter == 1) or (self.counter == 2)):
 			self.Shoot(P)
-                        print "Shooting start"
+                        P['Log'].Log("Shooting start")
                 elif((self.counter == 3) or (self.counter == 4)):
-                        print "Shooting end"
+                        P['Log'].Log("Shooting end")
 			self.UnShoot(P)
                 self.Zero()
 
 	def Shoot(self, P):
-		print "Called matty shoot "
+		P['Log'].Log("Called matty shoot ")
 	        noteFlag = False
 	        if(P['systemOn']):
 	                if((not self.isBlasting) and (not self.isOverheating)):
-				print "shorten your stream, i dont want my face burned off"
+				P['Log'].Log("shorten your stream, i dont want my face burned off")
 	                        self.isBlasting = True
 	                        self.blastTime = time.time()
 	                        P['blastSound'].start()
@@ -46,14 +46,14 @@ class MattyWand:
 				threading.Timer(P['overheatThresh'], self.Overheat, ([P])).start()
 
 	def Overheat(self, P):
-		print "overheat routine"
+		P['Log'].Log("overheat routine")
 		if(self.isBlasting):
 			if((time.time() - self.blastTime) > P['overheatSpeedThresh']):
 				P['ggs'].adjustSpeed(.04)
-				print "You should slow down before I overheat..."
+				P['Log'].Log("You should slow down before I overheat...")
 				P['beepSound'].play()
 			if((time.time() - self.blastTime) > P['overheatThresh']):
-				print "Oh its bad..."
+				P['Log'].Log("Oh its bad...")
         			#P['blastSound'].end()
         			#P['isBlasting'] = False
 				#self.isBlasting = False
@@ -65,13 +65,13 @@ class MattyWand:
 				P['ggs'].defaultSpeed()
 			
 	def UnShoot(self, P):
-		print "called matty unshoot"
+		P['Log'].Log("called matty unshoot")
 		if(not self.isBlasting):
-                        print "turn me off"
+                        P['Log'].Log("turn me off")
 			self.systemOn = False
 		else:
 			if(not self.isOverheating):
-				print "ending shoot sounds"
+				P['Log'].Log("ending shoot sounds")
 				P['blastSound'].end()
 				self.isBlasting = False
 			P['ggs'].defaultSpeed()
