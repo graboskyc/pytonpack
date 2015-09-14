@@ -1,32 +1,31 @@
-#!/bin/sh                                           
-# /etc/init.d/grabosky                              
-                                                    
-### BEGIN INIT INFO                                 
-# Provides:          noip                           
-# Required-Start:    $remote_fs $syslog             
-# Required-Stop:     $remote_fs $syslog             
-# Default-Start:     2 3 4 5                        
-# Default-Stop:      0 1 6                          
-# Short-Description: Simple script to start a progra
-m at boot                                           
-# Description:       A simple script which will star
-t / stop a program a boot /$                        
-### END INIT INFO                                   
-                                                    
-# If you want a command to always run, put it here  
-                                                    
-# Carry out specific functions when asked to by the 
-system                                              
-case "$1" in                                        
-  start)                                            
-    nohup /usr/bin/python /opt/GB/Runner.py                
-    ;;                                              
-  stop)                                             
-    ;;                                              
-  *)                                                
-    killall python                                  
-    exit 1                                          
-    ;;                                              
-esac                                                
-                                                    
-exit 0                         
+#!/bin/sh
+# /etc/init.d/grabosky 
+
+### BEGIN INIT INFO
+# Provides:          noip
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Simple script to start a program at boot
+# Description:       A simple script which will start / stop a program a boot /$
+### END INIT INFO
+
+# If you want a command to always run, put it here
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    nohup /usr/bin/python /opt/GB/Runner.py
+    ;;
+  stop)
+    kill -9 ` ps aux | grep Runner | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
+    exit 1
+    ;;
+  *)
+    kill -9 ` ps aux | grep Runner | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
+    exit 1
+    ;;
+esac
+
+exit 0
