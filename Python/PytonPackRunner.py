@@ -5,6 +5,9 @@ import time
 import sys
 import threading
 import signal
+import tornado.ioloop                                                                                                                                                                                       
+import tornado.web                                                                                                                                                                                          
+import tornado.websocket
 from GrabGBMusic import BGMusic,Sound, BlastSound
 from GrabGBLights import GrabGBLights
 from GrabGBMattyWand import MattyWand
@@ -117,6 +120,36 @@ def quitOut():
 		Pack['ggs'].processPattern()
 
 #############################
+# Web handler
+#############################
+class WebSocketHandler(tornado.websocket.WebSocketHandler):                                                                                                                                                 
+        # the client connected                                                                                                                                                                              
+	global Pack
+	global wandTracker
+        def open(self):
+                print "New client connected"
+                self.write_message("You are connected")
+
+        # the client sent the message
+        def on_message(self, message):
+		if (message.lower() == "power"):
+			Pack['Log'].Log("Someone told me to power on")
+			wandTracker.ForceTogglePower(Pack)
+		elif (message.lower() == "music"):
+			Pack['Log'].Log("Someone told me to touch the radio")
+			MusicListener("")
+		else:
+                	Pack['Log'].Log("Don't know what to do with that request")
+                	self.write_message("Unknown")
+
+        # client disconnected
+        def on_close(self):
+                print "Client disconnected"
+
+	def check_origin(self, origin):
+		return True
+
+#############################
 # Main prog and loop
 #############################
 
@@ -138,6 +171,13 @@ def main():
 	GPIO.add_event_detect(pinWand, GPIO.RISING, callback=WandListener)                      # wand connection
 
 	signal.signal(signal.SIGINT, quitHander)						# catch control+c
+
+	application = tornado.web.Application([(r"/", WebSocketHandler),])
+	application.listen(8888)
+        #tornado.ioloop.IOLoop.instance().start()
+	t = threading.Thread(target=tornado.ioloop.IOLoop.instance().start)
+    	t.daemon = True
+    	t.start()
 
 	# main loop
 	while True:

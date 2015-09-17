@@ -16,14 +16,17 @@
 # Carry out specific functions when asked to by the system
 case "$1" in
   start)
-    nohup /usr/bin/python /opt/GB/Runner.py
+    nohup /usr/bin/python /opt/GB/PytonPackRunner.py & 
+    nohup /usr/bin/python /opt/GB/Web/PytonPackWeb.py &
     ;;
   stop)
-    kill -9 ` ps aux | grep Runner | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
+    kill -9 ` ps aux | grep PytonPackRunner | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
+    kill -9 ` ps aux | grep PytonPackWeb | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
     exit 1
     ;;
   *)
-    kill -9 ` ps aux | grep Runner | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
+    kill -9 ` ps aux | grep PytonPackRunner | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
+    kill -9 ` ps aux | grep PytonPackWeb | head -n 1 | sed 's/ \+/ /g' | cut -d" " -f 2`
     exit 1
     ;;
 esac

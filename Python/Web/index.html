@@ -1,0 +1,30 @@
+<html>
+
+<head>
+	<title>{{ title }}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript">
+		var connection = new WebSocket('ws://10.0.0.24:8888');
+	</script>
+</head>
+
+<body>
+	<div style="width:100%;">
+		<h1>Pyton Proton Pack</h1>
+		<h3><a href="https://bitbucket.org/graboskyc/pytonpack">They Raspberry Pi and Python Powered Pack</a></h3>
+
+		<div style="float:left; width:100%;margin-left:13%;margin-bottom:10%;margin-top:10%;">
+			<button id="btn_music" style="width:74%; height:20%;">Toggle Music</button>
+		</div>
+		<div style="float:left; width:100%;margin-left:13%;margin-bottom:10%;">
+			<button id="btn_power" style="width:74%; height:20%;">Toggle Pack Power</button>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		document.getElementById('btn_music').addEventListener("click", function() { connection.send('music'); });
+		document.getElementById('btn_power').addEventListener("click", function() { connection.send('power'); });
+	</script>
+</body>
+
+</html>

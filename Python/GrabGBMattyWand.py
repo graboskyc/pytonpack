@@ -18,6 +18,10 @@ class MattyWand:
         def Inc(self):
                 self.counter = self.counter + 1
 
+	def ForceTogglePower(self, P):
+		P['Log'].Log("Forcing power toggle")
+		self.systemOn = not self.systemOn
+
         def Process(self, P):
 		global isBlasting
                 P['Log'].Log("Processing...")
