@@ -5,6 +5,7 @@ import time
 import sys
 import threading
 import signal
+import os
 import tornado.ioloop                                                                                                                                                                                       
 import tornado.web                                                                                                                                                                                          
 import tornado.websocket
@@ -138,6 +139,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 		elif (message.lower() == "music"):
 			Pack['Log'].Log("Someone told me to touch the radio")
 			MusicListener("")
+		elif (message.lower().startswith("volume")):
+			Pack['Log'].Log("Changing the volume boss")
+			args = message.split(" ")
+			os.system("amixer set PCM " + args[1] +"%")
 		else:
                 	Pack['Log'].Log("Don't know what to do with that request")
                 	self.write_message("Unknown")

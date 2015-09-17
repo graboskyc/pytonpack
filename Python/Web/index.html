@@ -1,30 +1,110 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-	<title>{{ title }}</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script type="text/javascript">
-		var connection = new WebSocket('ws://10.0.0.24:8888');
-	</script>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="{{ static_url("css/bootstrap.min.css") }}" rel="stylesheet">
+  <style type="text/css">
+    body {
+      padding-top: 60px;
+      padding-bottom: 40px;
+    }
+    
+    .marketing {
+      margin-top: 50px;
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+    
+    .marketing div {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .marketing h2 {
+      font-weight: normal;
+    }
+    
+    .marketing h2 a {
+      color: #000;
+    }
+    
+    .marketing div p {
+      margin-right: 10px;
+      margin-left: 10px;
+    }
+    
+    .marketing h4 {
+      text-align: center;
+    }
+  </style>
+  <script type="text/javascript">
+    var connection = new WebSocket('ws://10.0.0.24:8888');
+  </script>
 </head>
 
 <body>
-	<div style="width:100%;">
-		<h1>Pyton Proton Pack</h1>
-		<h3><a href="https://bitbucket.org/graboskyc/pytonpack">They Raspberry Pi and Python Powered Pack</a></h3>
+  <div class="container">
+    <div class="jumbotron">
+      <h1 id="grab_heroheading">Pyton Pack</h1>
+      <p id="grab_herotext"><a href="https://bitbucket.org/graboskyc/pytonpack">The Raspberry Pi and Python Powered Pack</a></p>
+    </div>
 
-		<div style="float:left; width:100%;margin-left:13%;margin-bottom:10%;margin-top:10%;">
-			<button id="btn_music" style="width:74%; height:20%;">Toggle Music</button>
-		</div>
-		<div style="float:left; width:100%;margin-left:13%;margin-bottom:10%;">
-			<button id="btn_power" style="width:74%; height:20%;">Toggle Pack Power</button>
-		</div>
-	</div>
+    <div class="container marketing">
+      <div class="row">
 
-	<script type="text/javascript">
-		document.getElementById('btn_music').addEventListener("click", function() { connection.send('music'); });
-		document.getElementById('btn_power').addEventListener("click", function() { connection.send('power'); });
-	</script>
+        <div class="col-md-2">
+        </div>
+        
+        <div class="col-md-4">
+          <a class="grab_power">
+            <img src="{{ static_url("img/Power_128x128.png") }}" alt="Power" border="0" />
+          </a>
+          <h2><a class="grab_power">Toggle Power</a></h2>
+        </div>
+
+        <div class="col-md-4">
+          <a class="grab_music">
+            <img src="{{ static_url("img/Music_128x128.png") }}" alt="Power" border="0" />
+          </a>
+          <h2><a class="grab_music">Toggle Music</a></h2>
+        </div>
+        
+        <div class="col-md-2">
+        </div>
+
+      </div>
+      <div class="row">
+
+        <div class="col-md-3">
+        </div>
+
+        <div class="col-md-6">
+          <button type="button" class="btn btn-success btn-lg grab_volume" data-volume="70">70%</button>
+          <button type="button" class="btn btn-success btn-lg grab_volume" data-volume="80">80%</button>
+          <button type="button" class="btn btn-warning btn-lg grab_volume" data-volume="85">85%</button>
+          <button type="button" class="btn btn-warning btn-lg grab_volume" data-volume="90">90%</button>
+          <button type="button" class="btn btn-warning btn-lg grab_volume" data-volume="95">95%</button>
+          <button type="button" class="btn btn-danger btn-lg grab_volume" data-volume="100">100%</button>
+          <h2>Volume Controls</h2>
+        </div>
+
+        <div class="col-md-3">
+        </div>
+      </div>
+    </div>
+  </div>
+      <script src="{{ static_url("js/jquery-1.11.3.min.js") }}"></script>
+
+      <script type="text/javascript">
+        $(function() {
+          $('.grab_power').click(function() {connection.send('power');});
+          $('.grab_music').click(function() {connection.send('music');});
+          $('button').click(function() { connection.send('volume '+ $(this).data('volume'));});
+        });
+      </script>
 </body>
 
 </html>
