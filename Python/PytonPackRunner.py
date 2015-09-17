@@ -46,6 +46,7 @@ soundFiles = {
 musicFiles = {
 	'Higher': "/opt/GB/Music/HigherHigher.ogg",
 	"Theme": "/opt/GB/Music/GBTheme.ogg",
+	"Rap": "/opt/GB/Music/Rap.ogg",
 	"WhichToPlay": "Theme"
 }
 
@@ -124,9 +125,11 @@ def quitOut():
 # Web handler
 #############################
 class WebSocketHandler(tornado.websocket.WebSocketHandler):                                                                                                                                                 
-        # the client connected                                                                                                                                                                              
 	global Pack
 	global wandTracker
+	global music
+	global musicFiles
+
         def open(self):
                 print "New client connected"
                 self.write_message("You are connected")
@@ -143,6 +146,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 			Pack['Log'].Log("Changing the volume boss")
 			args = message.split(" ")
 			os.system("amixer set PCM " + args[1] +"%")
+		elif (message.lower().startswith("track")):
+			Pack['Log'].Log("I didn't like that station")
+			args = message.split(" ")
+			music.setTrack(musicFiles[args[1]])
 		else:
                 	Pack['Log'].Log("Don't know what to do with that request")
                 	self.write_message("Unknown")

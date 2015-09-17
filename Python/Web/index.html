@@ -53,8 +53,8 @@
     </div>
 
     <div class="container marketing">
+      
       <div class="row">
-
         <div class="col-md-2">
         </div>
         
@@ -74,14 +74,13 @@
         
         <div class="col-md-2">
         </div>
-
       </div>
+      
       <div class="row">
-
         <div class="col-md-3">
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-6" id="grab_volume_ctnr">
           <button type="button" class="btn btn-success btn-lg grab_volume" data-volume="70">70%</button>
           <button type="button" class="btn btn-success btn-lg grab_volume" data-volume="80">80%</button>
           <button type="button" class="btn btn-warning btn-lg grab_volume" data-volume="85">85%</button>
@@ -94,6 +93,22 @@
         <div class="col-md-3">
         </div>
       </div>
+      
+      <div class="row">
+        <div class="col-md-3">
+        </div>
+
+        <div class="col-md-6" id="grab_track_ctnr">
+          <button type="button" class="btn btn-primary btn-lg" data-track="Theme">Theme</button>
+          <button type="button" class="btn btn-primary btn-lg" data-track="Higher">Higher</button>
+          <button type="button" class="btn btn-primary btn-lg" data-track="Rap">Rap</button>
+          <h2>Music Track</h2>
+        </div>
+
+        <div class="col-md-3">
+        </div>
+      </div>
+      
     </div>
   </div>
       <script src="{{ static_url("js/jquery-1.11.3.min.js") }}"></script>
@@ -102,7 +117,8 @@
         $(function() {
           $('.grab_power').click(function() {connection.send('power');});
           $('.grab_music').click(function() {connection.send('music');});
-          $('button').click(function() { connection.send('volume '+ $(this).data('volume'));});
+          $('#grab_volume_ctnr button').click(function() { connection.send('volume '+ $(this).data('volume'));});
+          $('#grab_track_ctnr button').click(function() { connection.send('track '+ $(this).data('track'));});
         });
       </script>
 </body>
