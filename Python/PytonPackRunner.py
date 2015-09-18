@@ -47,6 +47,7 @@ musicFiles = {
 	'Higher': "/opt/GB/Music/HigherHigher.ogg",
 	"Theme": "/opt/GB/Music/GBTheme.ogg",
 	"Rap": "/opt/GB/Music/Rap.ogg",
+	"Background": "/opt/GB/Music/main_menu_loop.ogg",
 	"WhichToPlay": "Theme"
 }
 
