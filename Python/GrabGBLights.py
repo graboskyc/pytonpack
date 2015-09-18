@@ -16,6 +16,8 @@ class GrabGBLights:
 		self.blinkDelay = self.defaultBlinkDelay
 
 		self.cyPattern = [0x08, 0x04, 0x02, 0x01]
+		self.cyOff = [0x00, 0x00, 0x00, 0x00]
+		self.cyDefault = self.cyPattern
                 self.cyCount = 0
 
 		self.setMode("Fill")
@@ -159,6 +161,7 @@ class GrabGBLights:
 			pattern.append(0x0FFF) # 00111111111111
 			pattern.append(0x1FFF) # 01111111111111
 			pattern.append(0x3FFF) # 11111111111111
+			self.cyPattern = self.cyDefault
 		if (mode == "Slime") or (mode == "Fill"):
 			pattern.append(0x1FFF) # 01111111111111
 			pattern.append(0x0FFF) # 10111111111111
@@ -257,6 +260,8 @@ class GrabGBLights:
 			#pattern.append(0x2FFF) # 11111111111111
 		if (mode == "DotOut") or (mode == "LineOut") or (mode == "Empty"):
 			pattern = pattern[::-1] # reverse it
+		if (mode == "Empty"):
+			self.cyPattern = self.cyOff
 
 		self.pattern = pattern
 

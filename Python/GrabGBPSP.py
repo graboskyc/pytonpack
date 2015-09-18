@@ -48,8 +48,9 @@ class PSP:
 	
 	def write(self, valuea, valueb):
 	    for i in reversed(range(16)):
-	        self.push_bit(self.get_bit(valuea, i))
 		if i <=8:
-			self.push_bit(self.get_bit(valueb, i))
+	        	self.push_bit(self.get_bit(valuea, i),self.get_bit(valueb,i))
+		else:
+			self.push_bit(self.get_bit(valuea, i))
 
 	    self.write_latch()
