@@ -45,7 +45,7 @@ soundFiles = {
 
 musicFiles = {
 	'Higher': "/opt/GB/Music/HigherHigher.ogg",
-	"Theme": "/opt/GB/Music/GBTheme.ogg",
+	"Theme": "/opt/GB/Music/GBThemeLOUD.ogg",
 	"Rap": "/opt/GB/Music/Rap.ogg",
 	"Background": "/opt/GB/Music/main_menu_loop.ogg",
 	"WhichToPlay": "Theme"
@@ -130,6 +130,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	global wandTracker
 	global music
 	global musicFiles
+	global humSound
 
         def open(self):
                 print "New client connected"
@@ -151,6 +152,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 			Pack['Log'].Log("I didn't like that station")
 			args = message.split(" ")
 			music.setTrack(musicFiles[args[1]])
+		elif (message.lower().startswith("hum")):
+			args = message.split(" ")
+			if (args[1] == "stop"):
+				humSound.stop()
+			else:
+				humSound.play()
 		else:
                 	Pack['Log'].Log("Don't know what to do with that request")
                 	self.write_message("Unknown")
