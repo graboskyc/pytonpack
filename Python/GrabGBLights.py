@@ -24,6 +24,9 @@ class GrabGBLights:
 		self.getPattern()
 
 		self.shift = PSP(pin1,pin4,pin2,pin3)
+	def reverseCyclotron(self):
+		self.cyPattern = self.cyPattern[::-1] # reverse it
+		self.cyDefault = self.cyPattern
 
 	def adjustSpeed(self, delay):
 		self.blinkDelay = delay

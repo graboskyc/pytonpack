@@ -30,6 +30,7 @@ Pack['overheatSpeedThresh'] = 5	# seconds before speed up before overheat
 Pack['overheatThresh'] = 10	# seconds before overheat
 musicWhileOff = True		# allow music to run while power switch off
 loggingEnabled = True		# whether to log to std out
+venkmanMode = False		# true spins cyclotron counter clockwise, false spins clockwise
 
 soundFiles = {
 	'start': "/opt/GB/Music/KJH_PackstartCombo.ogg", 		# pack turning on
@@ -158,6 +159,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 				humSound.stop()
 			else:
 				humSound.play()
+		elif (message.lower() == "cy"):
+			Pack['ggs'].reverseCyclotron()
 		else:
                 	Pack['Log'].Log("Don't know what to do with that request")
                 	self.write_message("Unknown")
@@ -180,6 +183,7 @@ def main():
 	global pinMusic
 	global pinWand
 	global wandTracker
+	global venkmanMode
 
 	music.setTrack(musicFiles[musicFiles["WhichToPlay"]])
 
@@ -198,6 +202,9 @@ def main():
 	t = threading.Thread(target=tornado.ioloop.IOLoop.instance().start)
     	t.daemon = True
     	t.start()
+
+	if not venkmanMode:
+		Pack['ggs'].reverseCyclotron()
 
 	# main loop
 	while True:
