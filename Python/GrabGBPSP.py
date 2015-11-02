@@ -20,7 +20,7 @@ class PSP:
 	    GPIO.setwarnings(False)
 	    GPIO.setmode(GPIO.BCM)
 	    GPIO.setup(self.dataPC, GPIO.OUT)
-            GPIO.setup(self.dataCy, GPIO.OUT)
+            #GPIO.setup(self.dataCy, GPIO.OUT)
 	    GPIO.setup(self.clock, GPIO.OUT, initial=GPIO.LOW)
 	    GPIO.setup(self.latch, GPIO.OUT, initial=GPIO.LOW)
 	    self.write(0,0)
@@ -34,8 +34,8 @@ class PSP:
 	def push_bit(self,bita, bitb=-1):
 	    GPIO.output(self.clock, 0)
 	    GPIO.output(self.dataPC, bita)
-            if bitb >= 0:
-                GPIO.output(self.dataCy, bitb)
+            #if bitb >= 0:
+            #    GPIO.output(self.dataCy, bitb)
 	    GPIO.output(self.clock, 1)
 	
 	

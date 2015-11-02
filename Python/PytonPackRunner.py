@@ -22,7 +22,7 @@ Pack = {}
 pin1 = 22			# serial power cell
 pin2 = 17			# SRCLK
 pin3 = 23			# RCLK
-pin4 = 27			# serial cyclotron
+pin4 = 27			# cyclotron to arduino
 pinMusic = 4			# enable disable music
 pinWand = 25			# audio connection to wand
 musicVolume = 1			# music volume
@@ -161,6 +161,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 				humSound.play()
 		elif (message.lower() == "cy"):
 			Pack['ggs'].reverseCyclotron()
+		elif (message.lower().startswith("pi")):
+			args = message.split(" ")
+			if(args[1] == "shut"):
+				os.system("/sbin/shutdown -h now")
 		else:
                 	Pack['Log'].Log("Don't know what to do with that request")
                 	self.write_message("Unknown")
@@ -190,6 +194,7 @@ def main():
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(pinMusic, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)				# start and stop music
 	GPIO.setup(pinWand, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)                                # wand connection
+	GPIO.setup(pin4, GPIO.OUT)								# arduino
 
         GPIO.add_event_detect(pinMusic, GPIO.FALLING, callback=MusicListener, bouncetime=1000)	# start and stop music
 	GPIO.add_event_detect(pinWand, GPIO.RISING, callback=WandListener)                      # wand connection
@@ -219,9 +224,11 @@ def main():
 				Pack['ggs'].setMode("Fill")
 			# blink lights
 			Pack['ggs'].processPattern()
+			GPIO.output(pin4, 1)
 		# switch is off
 		else:
 			# power down sequence
+			GPIO.output(pin4, 0)
 			quitOut()
 
 if __name__ == "__main__":
