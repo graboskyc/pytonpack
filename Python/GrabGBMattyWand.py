@@ -29,10 +29,14 @@ class MattyWand:
                 if(self.counter >= 6):
                         P['Log'].Log("Turned on")
 			self.systemOn = True
-                elif((self.counter == 1) or (self.counter == 2)):
+		elif (self.counter == 2):
+                #elif((self.counter == 1) or (self.counter == 2)):
 			self.Shoot(P)
                         P['Log'].Log("Shooting start")
-                elif((self.counter == 3) or (self.counter == 4)):
+		elif(self.counter == 5):
+			self.PowerDown(P)
+		elif(self.counter == 3):
+                #elif((self.counter == 3) or (self.counter == 4)):
                         P['Log'].Log("Shooting end")
 			self.UnShoot(P)
                 self.Zero()
@@ -67,12 +71,13 @@ class MattyWand:
 				P['ventSound'].play()
         			P['systemOn'] = False
 				P['ggs'].defaultSpeed()
+	def PowerDown(self, P):
+		self.systemOn = False
 			
 	def UnShoot(self, P):
 		P['Log'].Log("called matty unshoot")
 		if(not self.isBlasting):
-                        P['Log'].Log("turn me off")
-			self.systemOn = False
+			self.PowerDown(P)
 		else:
 			if(not self.isOverheating):
 				P['Log'].Log("ending shoot sounds")

@@ -12,7 +12,7 @@ This README would normally document whatever steps are necessary to get your app
 * use pip to install tornado for websockets to allow remote control of the pack via a phone
 
 ### Physical setup ###
-* wire up your shift registers and LEDs. This library is configured for 14 LEDs as seen graboskyc.tumblr.com
+* wire up your shift registers and LEDs. This library is configured for 14 LEDs as seen https://eus-www.sway-cdn.com/s/T8VNqgdMtSaoMvuF/images/lIJtbxtQRrg_hP
 * edit the Runner file at the top for all parameters including music/sound files and pins used
 * run ./PytonPackRunner.py to start manually
 * you can also run Web/PytonPackWeb.py to start a web site that will allow basic pack controls like turning on/off and toggling music
