@@ -129,19 +129,29 @@
         <div class="col-sm-3">
         </div>
 
-        <div class="col-sm-3" id="grab_hum_ctnr">
+        <div class="col-sm-6" id="grab_hum_ctnr">
           <button type="button" class="btn btn-default btn-lg" data-hum="start">Start Hum</button>
           <button type="button" class="btn btn-default btn-lg" data-hum="stop">Stop Hum</button>
           <h2>Background Hum</h2>
         </div>
 
-	<div class="col-sm-3" id="grab_cy_ctnr">
-          <button type="button" class="btn btn-danger btn-lg">Reverse Cyclotron</button>
-          <h2>Cyclotron Direction</h2>
-        </div>
-
         <div class="col-sm-3">
         </div>
+      </div>
+
+      <div class="row">                                                                                                        
+        <div class="col-md-3">                                                                                                 
+        </div>                                                                                                                 
+                                                                                                                               
+        <div class="col-md-6" id="grab_pi_ctnr">                                                                            
+         <!--<button type="button" class="btn btn-danger btn-lg" data-use="service">Restart Service</button>-->
+	 <button type="button" class="btn btn-danger btn-lg" data-use="shut">Shutdown</button>
+	 <!--<button type="button" class="btn btn-danger btn-lg" data-use="reboot">Reboot</button>-->
+         <h2>Pi Control</h2>
+        </div>
+                                                                                                                               
+        <div class="col-md-3">                                                                                                 
+        </div>                                                                                                                 
       </div>
       
     </div>
@@ -155,7 +165,7 @@
           $('#grab_volume_ctnr button').click(function() { connection.send('volume '+ $(this).data('volume'));});
           $('#grab_track_ctnr button').click(function() { connection.send('track '+ $(this).data('track'));});
           $('#grab_hum_ctnr button').click(function() { connection.send('hum '+ $(this).data('hum'));});
-	  $('#grab_cy_ctnr button').click(function() { connection.send('cy');});
+	  $('#grab_pi_ctnr button').click(function() { connection.send('pi '+ $(this).data('use'));});
         });
       </script>
 </body>

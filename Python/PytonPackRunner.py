@@ -30,7 +30,6 @@ Pack['overheatSpeedThresh'] = 5	# seconds before speed up before overheat
 Pack['overheatThresh'] = 10	# seconds before overheat
 musicWhileOff = True		# allow music to run while power switch off
 loggingEnabled = True		# whether to log to std out
-venkmanMode = False		# true spins cyclotron counter clockwise, false spins clockwise
 
 soundFiles = {
 	'start': "/opt/GB/Music/KJH_PackstartCombo.ogg", 		# pack turning on
@@ -68,7 +67,7 @@ Pack['blastSound'] = BlastSound(soundFiles["wandStart"], soundFiles["wandLoop"],
 Pack['ventSound'] = Sound(soundFiles["vent"])								# overheating sounds
 Pack['beepSound'] = Sound(soundFiles["beep"], 1)							# overheating sounds
 music = BGMusic(musicVolume)										# music track
-Pack['ggs'] = GrabGBLights(GrabLogger(loggingEnabled),pin1, pin2, pin3, pin4)				# powercell / cyclotron light class
+Pack['ggs'] = GrabGBLights(GrabLogger(loggingEnabled),pin1, pin2, pin3)					# powercell light class
 Pack['isPlaying']= False										# music state
 Pack['systemOn'] = False										# power switch state
 Pack['isBlasting'] = False										# shooting state
@@ -159,8 +158,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 				humSound.stop()
 			else:
 				humSound.play()
-		elif (message.lower() == "cy"):
-			Pack['ggs'].reverseCyclotron()
 		elif (message.lower().startswith("pi")):
 			args = message.split(" ")
 			if(args[1] == "shut"):
@@ -187,7 +184,6 @@ def main():
 	global pinMusic
 	global pinWand
 	global wandTracker
-	global venkmanMode
 
 	music.setTrack(musicFiles[musicFiles["WhichToPlay"]])
 
@@ -203,13 +199,9 @@ def main():
 
 	application = tornado.web.Application([(r"/", WebSocketHandler),])
 	application.listen(8888)
-        #tornado.ioloop.IOLoop.instance().start()
 	t = threading.Thread(target=tornado.ioloop.IOLoop.instance().start)
     	t.daemon = True
     	t.start()
-
-	if not venkmanMode:
-		Pack['ggs'].reverseCyclotron()
 
 	# main loop
 	while True:
@@ -224,11 +216,11 @@ def main():
 				Pack['ggs'].setMode("Fill")
 			# blink lights
 			Pack['ggs'].processPattern()
-			GPIO.output(pin4, 1)
+			GPIO.output(pin4, 1)							# turn on signal to trinket, saying cyclotron on
 		# switch is off
 		else:
 			# power down sequence
-			GPIO.output(pin4, 0)
+			GPIO.output(pin4, 0)							# turn off signal to trinket, saying cyclotron off
 			quitOut()
 
 if __name__ == "__main__":

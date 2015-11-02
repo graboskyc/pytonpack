@@ -5,28 +5,19 @@ import time
 import sys
 
 class GrabGBLights:
-	def __init__(self, Log, pin1, pin2, pin3, pin4):
+	def __init__(self, Log, pin1, pin2, pin3):
 		self.Log = Log
 		self.pin1 = pin1
 		self.pin2 = pin2
 		self.pin3 = pin3
-		self.pin4 = pin4
 		self.pattern = []
 		self.defaultBlinkDelay = .09
 		self.blinkDelay = self.defaultBlinkDelay
 
-		self.cyPattern = [0x08, 0x04, 0x02, 0x01]
-		self.cyOff = [0x00, 0x00, 0x00, 0x00]
-		self.cyDefault = self.cyPattern
-                self.cyCount = 0
-
 		self.setMode("Fill")
 		self.getPattern()
 
-		self.shift = PSP(pin1,pin4,pin2,pin3)
-	def reverseCyclotron(self):
-		self.cyPattern = self.cyPattern[::-1] # reverse it
-		self.cyDefault = self.cyPattern
+		self.shift = PSP(pin1,pin2,pin3)
 
 	def adjustSpeed(self, delay):
 		self.blinkDelay = delay
@@ -164,7 +155,6 @@ class GrabGBLights:
 			pattern.append(0x0FFF) # 00111111111111
 			pattern.append(0x1FFF) # 01111111111111
 			pattern.append(0x3FFF) # 11111111111111
-			self.cyPattern = self.cyDefault
 		if (mode == "Slime") or (mode == "Fill"):
 			pattern.append(0x1FFF) # 01111111111111
 			pattern.append(0x0FFF) # 10111111111111
@@ -263,8 +253,6 @@ class GrabGBLights:
 			#pattern.append(0x2FFF) # 11111111111111
 		if (mode == "DotOut") or (mode == "LineOut") or (mode == "Empty"):
 			pattern = pattern[::-1] # reverse it
-		if (mode == "Empty"):
-			self.cyPattern = self.cyOff
 
 		self.pattern = pattern
 
@@ -297,10 +285,9 @@ class GrabGBLights:
 		pattern = self.pattern
 		# copy locally so we dont adjust in the middle of a cycle
 		localBlinkDelay = self.blinkDelay
-		self.Log.Log("Counter: " + str(self.cyCount) + " value: " + str(self.cyPattern[self.cyCount]))
 
 		for bits in self.pattern:
-	        	self.shift.write(bits, self.cyPattern[self.cyCount])
+	        	self.shift.write(bits)
 	        	if(self.mode=="Fill"):
 				time.sleep(.04)
 			elif(self.mode=="Empty"):
@@ -315,6 +302,3 @@ class GrabGBLights:
 			self.setMode("Proton")
 
 
-		self.cyCount = self.cyCount + 1
-                if (self.cyCount == 4):
-                        self.cyCount = 0

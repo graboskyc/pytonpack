@@ -8,9 +8,8 @@ from time import sleep
 # further modified to dual write to two registers in parallel
 
 class PSP:
-	def __init__(self, data_pinA, data_pinB, clock_pin, latch_pin):
+	def __init__(self, data_pinA, clock_pin, latch_pin):
 	    self.dataPC = data_pinA
-            self.dataCy = data_pinB
 	    self.clock = clock_pin
 	    self.latch = latch_pin
 	    self.setup()
@@ -20,10 +19,9 @@ class PSP:
 	    GPIO.setwarnings(False)
 	    GPIO.setmode(GPIO.BCM)
 	    GPIO.setup(self.dataPC, GPIO.OUT)
-            #GPIO.setup(self.dataCy, GPIO.OUT)
 	    GPIO.setup(self.clock, GPIO.OUT, initial=GPIO.LOW)
 	    GPIO.setup(self.latch, GPIO.OUT, initial=GPIO.LOW)
-	    self.write(0,0)
+	    self.write(0)
 	
 	
 	def write_latch(self):
@@ -31,11 +29,9 @@ class PSP:
 	    GPIO.output(self.latch, 0)
 	
 	
-	def push_bit(self,bita, bitb=-1):
+	def push_bit(self,bita):
 	    GPIO.output(self.clock, 0)
 	    GPIO.output(self.dataPC, bita)
-            #if bitb >= 0:
-            #    GPIO.output(self.dataCy, bitb)
 	    GPIO.output(self.clock, 1)
 	
 	
@@ -46,11 +42,8 @@ class PSP:
 	        return 0
 	
 	
-	def write(self, valuea, valueb):
+	def write(self, valuea):
 	    for i in reversed(range(16)):
-		if i <=8:
-	        	self.push_bit(self.get_bit(valuea, i),self.get_bit(valueb,i))
-		else:
-			self.push_bit(self.get_bit(valuea, i))
+		self.push_bit(self.get_bit(valuea, i))
 
 	    self.write_latch()
