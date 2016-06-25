@@ -55,7 +55,8 @@
     }
   </style>
   <script type="text/javascript">
-    var connection = new WebSocket('ws://10.0.0.24:8888');
+    var localip = window.location.host;
+    var connection = new WebSocket('ws://'+localip+':8888');
   </script>
 </head>
 
